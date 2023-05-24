@@ -20,7 +20,7 @@ This code provides a real-time object detection and position estimation solution
    ```
    python3 -m pip install depthai-sdk
    ```
-3. Install ROS Noetic by following the instructions on:\
+3. Install ROS Noetic by following the instructions on:
    http://wiki.ros.org/noetic/Installation/Ubuntu
 4. OpenCV should be installed by default in Ubuntu 20.04, if not:
    ```
@@ -48,7 +48,7 @@ The code publishes the following ROS topics:
 
 ## Other functionalities
 
-1. To retrieve a trained model with roboflow:\
+1. To retrieve a trained model with roboflow:
    ```
    Python3 ./utils/depthai_sdk.py roboflow_model_name
    ```
