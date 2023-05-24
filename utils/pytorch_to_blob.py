@@ -2,13 +2,17 @@
 
 from pathlib import Path
 import torch
-import torchvision
 from torch import nn
 import kornia
 import onnx
 from onnxsim import simplify
 import blobconverter
 
+if len(sys.argv) < 2:
+    print("usage: Python3 ./utils/pytoch_to_blob pytorch_file_path")
+    exit(1)
+else:
+    model_name = sys.argv[1]
 name = 'blur'
 
 # class Model(nn.Module):
