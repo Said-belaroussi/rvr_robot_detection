@@ -55,7 +55,7 @@ The code publishes the following ROS topics:
    - `roboflow_model_name`: name of a pre-trained roboflow model, example: rvr_detection_v2/1
    - If there is an error, it probably means that the API key in the script reached the limit of downloads, you must change it by your own key, sign in to Roboflow to get one.
 
-2. `aruco_detector/script_calibration.py` outputs calibration matrix and distorsion coefficients that are need for `aruco_detector/aruco_position_detection.py`. You need first to have 20 non-redundant images taken by the camera you want to calibrate.
+2. `aruco_detector/script_calibration.py` outputs calibration matrix and distorsion coefficients that are need for `aruco_detector/aruco_position_detection.py`. You need first to have 20 non-redundant images of a checkerboard taken by the camera you want to calibrate.
    ```
    python3 aruco_detector/script_calibration.py
    ```
