@@ -243,7 +243,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("usage: /path/oak_detector.py /path/blob_file_name /path/json_file_name")
+        print("usage: Python3 /path/oak_detector.py /path/blob_file_name /path/json_file_name")
         exit(1)
     else:
         blob_filename = sys.argv[1]
