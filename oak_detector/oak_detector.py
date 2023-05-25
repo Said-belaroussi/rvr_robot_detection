@@ -23,24 +23,24 @@ import tf
 import tf2_ros
 import geometry_msgs.msg
 
+
 def publisher_bbox(i):
+    """
+    Function to publish the bounding box information as a Detection2DArray message
+    """
     msg = Detection2DArray()
     header = Header()
     header.stamp = rospy.Time.now()
     msg.header = header
     detection_2d_list = []
-    # print(data, "lol")
 
-    #print(i["confidence"])
     detection_2d_msg = Detection2D()
     detection_2d_msg.header = header
-    # print(detection_2d_msg)
     bounding_box_2d = BoundingBox2D()
     pose_2d = Pose2D()
     pose_2d.x = i["x"]
     pose_2d.y = i["y"]
     pose_2d.theta = i["confidence"]
-    # print(pose_2d)
     bounding_box_2d.center = pose_2d
     bounding_box_2d.size_x = i["width"]
     bounding_box_2d.size_y = i["height"]
@@ -48,14 +48,21 @@ def publisher_bbox(i):
     detection_2d_list.append(detection_2d_msg)
 
     msg.detections = detection_2d_list
-    # print(detection_2d_list)
     pub_bbox.publish(msg)
 
 def publisher_position(data):
+    """
+    Function to publish the position information as a tf message
+    data: (x,y) position
+    """
     br = tf.TransformBroadcaster()
     br.sendTransform((data["x"], data["y"], 0),(0,0,0,1),rospy.Time.now(),"Mercator_1", "odom")
 
+
 def get_config_from_json(json_filename):
+    """
+    Function to read configuration parameters from a JSON file
+    """
     f = open(json_filename)
     jsonData = json.load(f)
     f.close()
@@ -76,21 +83,22 @@ def get_config_from_json(json_filename):
 
 def visualize_detection(frame, detection, labelMap, box_position):
     try:
-        label = labelMap[detection.label]
+        label = labelMap[detection.label]  # Get the label of the detection from the label map
     except:
         label = detection.label
     x1, y1, x2, y2 = box_position
-    cv2.putText(frame, str(label), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))
+    cv2.putText(frame, str(label), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0))  # Draw the label on the frame
     cv2.putText(frame, f"Conf: {int(detection.confidence * 100)} %", (x1, y1 + 20), cv2.FONT_HERSHEY_SIMPLEX,
-                0.3, (0, 0, 0))
+                0.3, (0, 0, 0))  # Draw the confidence percentage on the frame
     cv2.putText(frame, f"x: {int(detection.spatialCoordinates.x/10)} cm", (x1, y1 + 30), cv2.FONT_HERSHEY_SIMPLEX,
-                0.3, (0, 0, 0))
+                0.3, (0, 0, 0))  # Draw the x-coordinate of the spatial position on the frame
     cv2.putText(frame, f"y: {int(detection.spatialCoordinates.z/10)} cm", (x1, y1 + 40), cv2.FONT_HERSHEY_SIMPLEX,
-                0.3, (0, 0, 0))
+                0.3, (0, 0, 0))  # Draw the y-coordinate of the spatial position on the frame
     cv2.putText(frame, f"z: {int(detection.spatialCoordinates.y/10)} cm", (x1, y1 + 50), cv2.FONT_HERSHEY_SIMPLEX,
-                0.3, (0, 0, 0))
+                0.3, (0, 0, 0))  # Draw the z-coordinate of the spatial position on the frame
 
-    cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255), cv2.FONT_HERSHEY_SIMPLEX)
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255), cv2.FONT_HERSHEY_SIMPLEX)  # Draw the bounding box on the frame
+
 
 
 def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, offset=(0,0), IR=False):
@@ -98,7 +106,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
     (confidenceThreshold, numClasses, anchors, anchorMasks,
      coordinateSize, iouThreshold, inputSizeX, inputSizeY, labelMap) = get_config_from_json(json_filename)
 
-
+    # Define camera pipeline and its components
     pipeline = dai.Pipeline()
 
     # Define needed components
@@ -202,33 +210,33 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 bbox_data = dict()
                 position_data = dict()
 
-                # Bounding box is normalized by default
-                # Transforming relatively to frame shape
                 x1 = int(detection.xmin * width)
                 x2 = int(detection.xmax * width)
                 y1 = int(detection.ymin * height)
                 y2 = int(detection.ymax * height)
 
                 # Bounding box info for detection ros msg
-                bbox_data["x"] = (x1+x2)/2
-                bbox_data["y"] = (y1+y2)/2
-                bbox_data["width"] = x2 -x1
+                bbox_data["x"] = (x1 + x2) / 2
+                bbox_data["y"] = (y1 + y2) / 2
+                bbox_data["width"] = x2 - x1
                 bbox_data["height"] = y2 - y1
                 bbox_data["confidence"] = detection.confidence
 
                 # Position info for tf message msg
                 offset_x, offset_y = offset
-                position_data["x"] = ((detection.spatialCoordinates.x)+offset_x)/1000
-                position_data["y"] = ((detection.spatialCoordinates.z)+offset_y)/1000
+                position_data["x"] = ((detection.spatialCoordinates.x) + offset_x) / 1000
+                position_data["y"] = ((detection.spatialCoordinates.z) + offset_y) / 1000
 
-                publisher_bbox(bbox_data)
-                publisher_position(position_data)
+                publisher_bbox(bbox_data)  # Publish the bounding box data
+                publisher_position(position_data)  # Publish the position data
 
                 if visualize == True:
-                    visualize_detection(frame, detection, labelMap, (x1, y1, x2, y2))
+                    visualize_detection(frame, detection, labelMap,
+                                        (x1, y1, x2, y2))  # Visualize the detection on the frame
+
             if visualize == True:
                 cv2.putText(frame, f"FPS: {int(fps)}", (0, frame.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                            0.5, (0, 0, 0))
+                            0.5, (0, 0, 0))  # Draw the FPS on the frame
                 cv2.imshow("Detections with position", frame)
                 if cv2.waitKey(1) == ord('q'):
                     break
