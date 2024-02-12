@@ -1,5 +1,28 @@
 # Sphero RVR Robot Detection
 
+## Quick Setup that should be sufficient on the robots at Iridia:
+
+python3 -m pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org depthai
+
+sudo apt install ros-noetic-vision-msgs
+
+Set the udev rules : 
+
+echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="03e7", MODE="0666"' | sudo tee /etc/udev/rules.d/80-movidius.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger
+
+Unplug and plug camera if necessary.
+
+Quick Launch:
+
+cd oak_detector/
+
+python3 oak_detector.py ../models/rvr_detection_v2_3.blob ../models/rvr_detection_v2_3.json
+
+OR to publish images on ROS topic "oak_frames" :
+
+python3 oak_detector.py ../models/rvr_detection_v2_3.blob ../models/rvr_detection_v2_3.json visualize 
+
 ## Introduction
 This code provides a real-time object detection and position estimation solution using the Oak-D camera and DepthAI API. The code detects objects using a YOLOv5 neural network and publishes the detected objects' positions and bounding boxes to specific ROS topics.
 
