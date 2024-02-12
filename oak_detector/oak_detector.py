@@ -23,6 +23,11 @@ import tf
 import tf2_ros
 import geometry_msgs.msg
 
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
+
+
 
 def publisher_bbox(i):
     """
@@ -58,6 +63,15 @@ def publisher_position(data):
     br = tf.TransformBroadcaster()
     br.sendTransform((data["x"], data["y"], 0),(0,0,0,1),rospy.Time.now(),"Mercator_1", "odom")
 
+def publisher_images_post_proc(frame):
+    """
+    Function to publish the frame as ROS messages
+    """
+    bridge = CvBridge()
+    if frame is None:
+        return
+    frame_msg = bridge.cv2_to_imgmsg(frame, "rgb8")
+    pub_frame.publish(frame_msg)
 
 def get_config_from_json(json_filename):
     """
@@ -233,13 +247,18 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 if visualize == True:
                     visualize_detection(frame, detection, labelMap,
                                         (x1, y1, x2, y2))  # Visualize the detection on the frame
+                    # Publish frame as ROS Image message
+                    publisher_images_post_proc(frame)
 
             if visualize == True:
-                cv2.putText(frame, f"FPS: {int(fps)}", (0, frame.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
-                            0.5, (0, 0, 0))  # Draw the FPS on the frame
-                cv2.imshow("Detections with position", frame)
+                # cv2.putText(frame, f"FPS: {int(fps)}", (0, frame.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
+                #            0.5, (0, 0, 0))  # Draw the FPS on the frame
+                # Publish frame as ROS Image message
+                publisher_images_post_proc(frame)
+                # cv2.imshow("Detections with position", frame)
                 if cv2.waitKey(1) == ord('q'):
                     break
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
@@ -255,5 +274,6 @@ if __name__ == "__main__":
 
     rospy.init_node("oak_detector", anonymous=True)
     pub_bbox = rospy.Publisher("oak", Detection2DArray, queue_size=1)
+    pub_frame = rospy.Publisher("oak_frames", Image, queue_size=1)
     start_oak_camera(blob_filename, json_filename, visualize)
 
