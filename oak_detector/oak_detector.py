@@ -244,11 +244,11 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 publisher_bbox(bbox_data)  # Publish the bounding box data
                 publisher_position(position_data)  # Publish the position data
 
-                if visualize == True:
-                    visualize_detection(frame, detection, labelMap,
-                                        (x1, y1, x2, y2))  # Visualize the detection on the frame
-                    # Publish frame as ROS Image message
-                    publisher_images_post_proc(frame)
+                # if visualize == True:
+                #     visualize_detection(frame, detection, labelMap,
+                #                         (x1, y1, x2, y2))  # Visualize the detection on the frame
+                #     # Publish frame as ROS Image message
+                #     publisher_images_post_proc(frame)
 
             if visualize == True:
                 # cv2.putText(frame, f"FPS: {int(fps)}", (0, frame.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
@@ -256,8 +256,8 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 # Publish frame as ROS Image message
                 publisher_images_post_proc(frame)
                 # cv2.imshow("Detections with position", frame)
-                if cv2.waitKey(1) == ord('q'):
-                    break
+                # if cv2.waitKey(1) == ord('q'):
+                #     break
 
 
 if __name__ == "__main__":
