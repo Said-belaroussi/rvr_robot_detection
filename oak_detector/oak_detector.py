@@ -70,7 +70,7 @@ def publisher_images_post_proc(frame):
     bridge = CvBridge()
     if frame is None:
         return
-    frame_msg = bridge.cv2_to_imgmsg(frame, "rgb8")
+    frame_msg = bridge.cv2_to_imgmsg(frame, "bgr8")
     pub_frame.publish(frame_msg)
 
 def get_config_from_json(json_filename):
