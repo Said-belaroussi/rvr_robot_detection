@@ -143,7 +143,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
     camRgb.setPreviewSize(inputSizeX, inputSizeY)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
     camRgb.setInterleaved(False)
-    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
+    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
 
     # If NN take horizontally compressed images as input. Increases FOV
     if compressed == True:
