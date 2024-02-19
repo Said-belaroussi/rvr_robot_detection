@@ -33,7 +33,7 @@ def start_oak_camera():
 
     # Camera setup
     camRgb.setPreviewSize(1280, 720)  # Set resolution to 720p
-    camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_720_P)
+    camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
 
     camRgb.preview.link(xoutRgb.input)
 
@@ -53,5 +53,5 @@ if __name__ == "__main__":
     # Initialize ROS node and publishers
     rospy.init_node("oak_camera_publisher", anonymous=True)
     pub_frame = rospy.Publisher("oak_frames", Image, queue_size=1)
-    
+
     start_oak_camera()
