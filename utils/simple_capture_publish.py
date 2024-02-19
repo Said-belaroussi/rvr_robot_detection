@@ -21,7 +21,6 @@ def start_oak_camera():
     """
     Function to start capturing frames from the OAK camera
     """
-
     # Define camera pipeline and its components
     pipeline = dai.Pipeline()
 
@@ -42,12 +41,18 @@ def start_oak_camera():
         # Output queue will be used to get the rgb frames
         queue = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
-        while True:
-            inRgb = queue.get()  # Blocking call, will wait until a new data has arrived
-            frame = inRgb.getCvFrame()  # Get OpenCV frame from NV12 data
+        try:
+            while True:
+                inRgb = queue.get()  # Blocking call, will wait until a new data has arrived
+                frame = inRgb.getCvFrame()  # Get OpenCV frame from NV12 data
 
-            # Publish the frame
-            publisher_images(frame)
+                # Publish the frame
+                publisher_images(frame)
+
+        except KeyboardInterrupt:
+            rospy.loginfo("Keyboard Interrupt detected. Stopping...")
+            # Release resources and stop the camera
+            device.close()
 
 if __name__ == "__main__":
     # Initialize ROS node and publishers
