@@ -40,19 +40,21 @@ def start_oak_camera():
     with dai.Device(pipeline) as device:
         # Output queue will be used to get the rgb frames
         queue = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
+        running = True
 
-        try:
-            while True:
+        while running:
+            try:
                 inRgb = queue.get()  # Blocking call, will wait until a new data has arrived
                 frame = inRgb.getCvFrame()  # Get OpenCV frame from NV12 data
 
                 # Publish the frame
                 publisher_images(frame)
 
-        except KeyboardInterrupt:
-            rospy.loginfo("Keyboard Interrupt detected. Stopping...")
-            # Release resources and stop the camera
-            device.close()
+            except KeyboardInterrupt:
+                rospy.loginfo("Keyboard Interrupt detected. Stopping...")
+                # Release resources and stop the camera
+                device.close()
+                running = False
 
 if __name__ == "__main__":
     # Initialize ROS node and publishers
