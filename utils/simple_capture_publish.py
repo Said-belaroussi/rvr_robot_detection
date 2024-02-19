@@ -35,7 +35,7 @@ def start_oak_camera():
     # Camera setup
     camRgb.setPreviewSize(1280, 720)  # Set resolution to 720p
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-
+    camRgb.setPreviewKeepAspectRatio(False) # To not crop the frame when resizing
     camRgb.preview.link(xoutRgb.input)
 
     # Connect to device and start processing
