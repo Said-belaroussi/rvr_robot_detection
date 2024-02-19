@@ -53,4 +53,6 @@ def start_oak_camera():
             publisher_images(frame)
 
 if __name__ == "__main__":
+    rospy.init_node("oak_detector", anonymous=True)
+    pub_frame = rospy.Publisher("oak_frames", Image, queue_size=1)
     start_oak_camera()
