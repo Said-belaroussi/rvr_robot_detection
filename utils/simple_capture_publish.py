@@ -3,7 +3,7 @@
 import rospy
 from std_msgs.msg import Header
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
+from cv_bridge import CvBridge, CvBridgeError
 import cv2
 import depthai as dai
 
