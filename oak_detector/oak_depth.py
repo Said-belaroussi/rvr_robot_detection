@@ -16,9 +16,12 @@ def publish_depth(depth_data):
     
     # Calculate middle index of the depth map
     middle_index = depth_data.shape[1] // 2
+    print("Depth data shape: ", depth_data.shape)
+    print("Middle index: ", middle_index)
     
     # Get depth along the middle line
-    depth_values = depth_data[:, middle_index]
+    depth_values = depth_data[middle_index, :]
+    print("Depth values: ", depth_values)
     
     # Create LaserScan message
     scan_msg = LaserScan()
