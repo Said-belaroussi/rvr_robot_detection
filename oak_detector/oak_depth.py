@@ -15,7 +15,7 @@ def publish_depth(depth_data):
     header.stamp = rospy.Time.now()
     
     # Calculate middle index of the depth map
-    middle_index = depth_data.shape[1] // 2
+    middle_index = depth_data.shape[0] // 2
     print("Depth data shape: ", depth_data.shape)
     print("Middle index: ", middle_index)
     
