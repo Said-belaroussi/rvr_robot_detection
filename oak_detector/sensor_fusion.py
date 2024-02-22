@@ -12,8 +12,8 @@ class LaserFusionNode:
         rospy.init_node('laser_fusion_node', anonymous=True)
         
         # Subscribe to laser scan topics
-        rospy.Subscriber('/lidar_scan', LaserScan, self.lidar_callback)
-        rospy.Subscriber('/camera_scan', LaserScan, self.camera_callback)
+        rospy.Subscriber('/scan', LaserScan, self.lidar_callback)
+        rospy.Subscriber('/oak_depth', LaserScan, self.camera_callback)
         
         # Create publisher for fused data
         self.fused_pub = rospy.Publisher('/fused_scan', LaserScan, queue_size=10)
