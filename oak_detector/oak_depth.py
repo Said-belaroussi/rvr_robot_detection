@@ -9,33 +9,31 @@ from sensor_msgs.msg import LaserScan
 
 def publish_depth(depth_data):
     """
-    Function to publish the depth along the middle line in the depth map
+    Function to publish the depth along all lines in the depth map
     """
     header = rospy.Header()
     header.stamp = rospy.Time.now()
     
-    # Calculate middle index of the depth map
-    middle_index = depth_data.shape[0] // 2
-    print("Depth data shape: ", depth_data.shape)
-    print("Middle index: ", middle_index)
+    # Get number of rows and columns in depth map
+    num_rows, num_cols = depth_data.shape
     
-    # Get depth along the middle line
-    depth_values = depth_data[middle_index, :]
-    print("Depth values: ", depth_values)
-    
-    # Create LaserScan message
-    scan_msg = LaserScan()
-    scan_msg.header = header
-    scan_msg.angle_min = 0.0
-    scan_msg.angle_max = 0.0
-    scan_msg.angle_increment = 0.0
-    scan_msg.time_increment = 0.0
-    scan_msg.scan_time = 0.0
-    scan_msg.range_min = 0.0
-    scan_msg.range_max = 10.0  # Maximum range of 10 meters
-    scan_msg.ranges = depth_values.tolist()
-    
-    pub_depth.publish(scan_msg)
+    # Create LaserScan messages for each row
+    for row_index in range(num_rows):
+        depth_values = depth_data[row_index, :]
+        
+        # Create LaserScan message
+        scan_msg = LaserScan()
+        scan_msg.header = header
+        scan_msg.angle_min = 0.0
+        scan_msg.angle_max = 0.0
+        scan_msg.angle_increment = 0.0
+        scan_msg.time_increment = 0.0
+        scan_msg.scan_time = row_index
+        scan_msg.range_min = 0.0
+        scan_msg.range_max = 10.0  # Maximum range of 10 meters
+        scan_msg.ranges = depth_values.tolist()
+        
+        pub_depth.publish(scan_msg)
 
 def start_oak_camera():
     # Define camera pipeline and its components
