@@ -17,6 +17,8 @@ from vision_msgs.msg import BoundingBox2D
 from geometry_msgs.msg import Pose2D
 from geometry_msgs.msg import Point
 from nav_msgs.msg import Odometry
+from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import Pose
 import rospkg
 
 import tf
@@ -220,6 +222,8 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
             detections = inDet.detections
 
             height, width = frame.shape[0], frame.shape[1]
+
+            detections_position = PoseArray()
             for detection in detections:
                 bbox_data = dict()
                 position_data = dict()
@@ -241,6 +245,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 position_data["x"] = ((detection.spatialCoordinates.x) + offset_x) / 1000
                 position_data["y"] = ((detection.spatialCoordinates.z) + offset_y) / 1000
 
+                detections_position.poses.append(Pose(Point(position_data["x"], position_data["y"], 0), geometry_msgs.msg.Quaternion(0, 0, 0, 1)))
                 publisher_bbox(bbox_data)  # Publish the bounding box data
                 publisher_position(position_data)  # Publish the position data
 
@@ -249,7 +254,8 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 #                         (x1, y1, x2, y2))  # Visualize the detection on the frame
                 #     # Publish frame as ROS Image message
                 #     publisher_images_post_proc(frame)
-
+            # Publish the position data of each detection in a PoseArray message to the cam_poses topic    
+            pub_poses.publish(detections_position)
             if visualize == True:
                 # cv2.putText(frame, f"FPS: {int(fps)}", (0, frame.shape[0] - 5), cv2.FONT_HERSHEY_SIMPLEX,
                 #            0.5, (0, 0, 0))  # Draw the FPS on the frame
@@ -275,5 +281,7 @@ if __name__ == "__main__":
     rospy.init_node("oak_detector", anonymous=True)
     pub_bbox = rospy.Publisher("oak", Detection2DArray, queue_size=1)
     pub_frame = rospy.Publisher("oak_frames", Image, queue_size=1)
+    pub_poses = rospy.Publisher("cam_poses", PoseArray, queue_size=1)
+
     start_oak_camera(blob_filename, json_filename, visualize)
 
