@@ -1,32 +1,39 @@
 #!/usr/bin/env python3
 
+import json
+import sys
 import rospy
 import numpy as np
-import cv2
 import depthai as dai
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
+from sensor_msgs.msg import LaserScan
 
 def publish_depth(depth_data):
     """
-    Function to publish the depth image
+    Function to publish the depth along all lines in the depth map
     """
     header = rospy.Header()
     header.stamp = rospy.Time.now()
-
-    # Convert depth data to uint16 format (mm)
-    depth_data_uint16 = (depth_data * 1000).astype(np.uint16)
-
-    # Create Image message
-    depth_image_msg = Image()
-    depth_image_msg.header = header
-    depth_image_msg.height = depth_data.shape[0]
-    depth_image_msg.width = depth_data.shape[1]
-    depth_image_msg.encoding = '16UC1'  # 16-bit unsigned integer, 1 channel
-    depth_image_msg.step = depth_image_msg.width * 2  # 16-bit depth data
-    depth_image_msg.data = depth_data_uint16.tobytes()
-
-    pub_depth.publish(depth_image_msg)
+    
+    # Get number of rows and columns in depth map
+    num_rows, num_cols = depth_data.shape
+    
+    # Create LaserScan messages for each row
+    for row_index in range(num_rows):
+        depth_values = depth_data[row_index, :]
+        
+        # Create LaserScan message
+        scan_msg = LaserScan()
+        scan_msg.header = header
+        scan_msg.angle_min = 0.0
+        scan_msg.angle_max = 0.0
+        scan_msg.angle_increment = 0.0
+        scan_msg.time_increment = 0.0
+        scan_msg.scan_time = row_index
+        scan_msg.range_min = 0.0
+        scan_msg.range_max = 10.0  # Maximum range of 10 meters
+        scan_msg.ranges = depth_values.tolist()
+        
+        pub_depth.publish(scan_msg)
 
 def start_oak_camera():
     # Define camera pipeline and its components
@@ -61,5 +68,5 @@ def start_oak_camera():
 
 if __name__ == "__main__":
     rospy.init_node("oak_depth_publisher", anonymous=True)
-    pub_depth = rospy.Publisher("oak_depth", Image, queue_size=1)
+    pub_depth = rospy.Publisher("oak_depth", LaserScan, queue_size=1)
     start_oak_camera()
