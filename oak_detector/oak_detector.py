@@ -31,7 +31,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 
-def publisher_bbox(i):
+def publisher_bbox(bbox_data_list):
     """
     Function to publish the bounding box information as a Detection2DArray message
     """
@@ -41,18 +41,19 @@ def publisher_bbox(i):
     msg.header = header
     detection_2d_list = []
 
-    detection_2d_msg = Detection2D()
-    detection_2d_msg.header = header
-    bounding_box_2d = BoundingBox2D()
-    pose_2d = Pose2D()
-    pose_2d.x = i["x"]
-    pose_2d.y = i["y"]
-    pose_2d.theta = i["confidence"]
-    bounding_box_2d.center = pose_2d
-    bounding_box_2d.size_x = i["width"]
-    bounding_box_2d.size_y = i["height"]
-    detection_2d_msg.bbox = bounding_box_2d
-    detection_2d_list.append(detection_2d_msg)
+    for i in bbox_data_list:
+        detection_2d_msg = Detection2D()
+        detection_2d_msg.header = header
+        bounding_box_2d = BoundingBox2D()
+        pose_2d = Pose2D()
+        pose_2d.x = i["x"]
+        pose_2d.y = i["y"]
+        pose_2d.theta = i["confidence"]
+        bounding_box_2d.center = pose_2d
+        bounding_box_2d.size_x = i["width"]
+        bounding_box_2d.size_y = i["height"]
+        detection_2d_msg.bbox = bounding_box_2d
+        detection_2d_list.append(detection_2d_msg)
 
     msg.detections = detection_2d_list
     pub_bbox.publish(msg)
@@ -224,6 +225,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
             height, width = frame.shape[0], frame.shape[1]
 
             detections_position = PoseArray()
+            bbox_data_list = []
             for detection in detections:
                 bbox_data = dict()
                 position_data = dict()
@@ -246,7 +248,7 @@ def start_oak_camera(blob_filename, json_filename, visualize, compressed=True, o
                 position_data["y"] = ((detection.spatialCoordinates.z) + offset_y) / 1000
 
                 detections_position.poses.append(Pose(Point(position_data["x"], position_data["y"], 0), geometry_msgs.msg.Quaternion(0, 0, 0, 1)))
-                publisher_bbox(bbox_data)  # Publish the bounding box data
+                bbox_data_list.append(bbox_data)
                 publisher_position(position_data)  # Publish the position data
 
                 if visualize == True:
