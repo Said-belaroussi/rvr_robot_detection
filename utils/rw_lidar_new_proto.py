@@ -14,7 +14,7 @@ import tf2_ros
 import tf2_geometry_msgs
 
 TH = -3.14
-SPEED = 0.6
+SPEED = 0.5
 X = 1.85
 Y = -3.07
 
@@ -45,16 +45,16 @@ def obstacle_avoidance(idx, dist):
     data_to_send = Float32MultiArray()
     if idx >= 505:
         idx -= 505
-    if dist > 0.37:
+    if dist > 0.9: # 0.37
         left = SPEED
         right = SPEED
     else:
-        if 484 >= idx >= 378:
-            left = SPEED * 0.5
-            right = -SPEED * 0.5
-        elif 378 > idx >= 272:
-            left = -SPEED * 0.5
-            right = SPEED * 0.5
+        if 368 >= idx >= 252: #if 484 >= idx >= 378:
+            left = SPEED
+            right = -SPEED
+        elif 252 > idx >= 136: #elif 378 > idx >= 272:
+            left = -SPEED
+            right = SPEED
         else:
             left = SPEED
             right = SPEED
